@@ -1,0 +1,18 @@
+syntax="proto3";
+
+package responseSchemapb;
+
+option go_package="./responseProto/;responseSchemapb";
+
+
+message Request{
+    string handle = 1;
+}
+
+message Response{
+    int64 numSubmissions = 1;
+}
+
+service Codeforces {
+    rpc CfRequest(Request) returns (Response) {};
+}
