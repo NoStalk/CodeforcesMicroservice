@@ -9,49 +9,6 @@ import (
 	"os"
 )
 
-// type responseObject struct{
-//     Status string
-//     Result []result
-// }
-
-// type result struct{
-//     Id int
-//     ContestId int
-//     CreationTimeSeconds string
-//     RelativeTimeSeconds int
-//     Problem problem
-//     Author author
-//     ProgrammingLanguage string
-//     Verdict string
-//     Testset string
-//     PassedTestCount int
-//     TimeConsumedMillis int
-//     MemoryConsumedBytes int64
-// }
-
-// type problem struct{
-//     ContestId int
-//     Index string
-//     Name string
-//     Type string
-//     Points int
-//     Ratings int
-//     Tags []string
-// }
-
-// type author struct{
-//     ContestId int
-//     Members []member
-//     ParticipantType string
-//     Ghost bool
-//     StartTimeSeconds int
-// }
-
-// type member struct{
-//     Handle string
-// }
-
-
 func UnmarshalCFResponse(data []byte) (CFResponse, error) {
 	var r CFResponse
 	err := json.Unmarshal(data, &r)
