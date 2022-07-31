@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	utilities "github.com/NoStalk/serviceUtilities"
 )
 
 func UnmarshalCFResponse(data []byte) (CFResponse, error) {
@@ -65,6 +66,7 @@ type Problem struct {
 
 
 func main(){
+	
 	response, err := http.Get("https://codeforces.com/api/user.status?handle=zeus_codes")
 
     if err != nil {
@@ -81,5 +83,7 @@ func main(){
         fmt.Printf("Couldnt unmarshal the byte slice: %v", err);
     }
     fmt.Println(len(responseCF.Result));
-
+	client, ctx, cancel := utilities.OpenDatabaseConnection();
+	utilities.DatabaseUtility(client, ctx, "r@g.com");
+	utilities.CloseDatabaseConnection(client, ctx, cancel);
 }
