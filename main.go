@@ -7,7 +7,10 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
+
 	utilities "github.com/NoStalk/serviceUtilities"
+
 )
 
 func UnmarshalCFResponse(data []byte) (CFResponse, error) {
@@ -65,6 +68,8 @@ type Problem struct {
 
 
 
+
+
 func main(){
 	
 	response, err := http.Get("https://codeforces.com/api/user.status?handle=zeus_codes")
@@ -83,7 +88,15 @@ func main(){
         fmt.Printf("Couldnt unmarshal the byte slice: %v", err);
     }
     fmt.Println(len(responseCF.Result));
-	client, ctx, cancel := utilities.OpenDatabaseConnection();
-	utilities.DatabaseUtility(client, ctx, "r@g.com");
-	utilities.CloseDatabaseConnection(client, ctx, cancel);
+	start := time.Now();
+	resources, err := utilities.OpenDatabaseConnection();
+	if err != nil {
+		fmt.Println("Couldnt open a database collection");
+	}
+	lastContestData := utilities.GetLastContest("r@g.com","leetcode",resources);
+	lastSubmission := utilities.GetLastSubmission("r@g.com","leetcode",resources);
+	//utilities.UpdatePlatformData(resources, "r@g.com","leetcode");
+	fmt.Println(lastContestData,lastSubmission);
+	utilities.CloseDatabaseConnection(resources);
+	fmt.Printf("Time taken for the update operation: %f seconds\n", time.Since(start).Seconds());
 }
