@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package proto;
 
-option go_package = "./proto/;codeforcesMSpb";
+option go_package = "./proto/;platformDatapb";
 
 message Submission {
     string date = 1;
@@ -15,13 +15,19 @@ message Submission {
 message Contest {
     string contestName = 1;
     double rank = 2;
-    double rating = 3;
-    int32 problemSolved = 4;
+    double old_rating = 3;
+    double new_rating = 4;
+    double rating_update_time_seconds = 6;
+    double contest_id = 7;
 }
 
-message Response {
+message SubmissionResponse {
   repeated Submission submissions = 1;
-  repeated Contest contests = 2;
+  
+}
+
+message ContestResponse{
+repeated Contest contests = 1;
 }
 
 message Request {
@@ -33,8 +39,9 @@ message OperationStatus {
   string userHandle = 2;
 }
 
-service CodeforcesMicroservice {
-  rpc getUserSubmissions(Request) returns (Response){};
+service FetchPlatformData {
+  rpc getUserSubmissions(Request) returns (SubmissionResponse){};
+  rpc getUserContests(Request) returns (ContestResponse);
   rpc getAllUserSubmissions(stream Request) returns (stream OperationStatus){};
 }
 
