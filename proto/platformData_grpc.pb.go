@@ -24,7 +24,7 @@ const _ = grpc.SupportPackageIsVersion7
 type FetchPlatformDataClient interface {
 	GetUserSubmissions(ctx context.Context, in *Request, opts ...grpc.CallOption) (*SubmissionResponse, error)
 	GetUserContests(ctx context.Context, in *Request, opts ...grpc.CallOption) (*ContestResponse, error)
-	GetAllUserSubmissions(ctx context.Context, opts ...grpc.CallOption) (FetchPlatformData_GetAllUserSubmissionsClient, error)
+	GetAllUserData(ctx context.Context, opts ...grpc.CallOption) (FetchPlatformData_GetAllUserDataClient, error)
 }
 
 type fetchPlatformDataClient struct {
@@ -53,30 +53,30 @@ func (c *fetchPlatformDataClient) GetUserContests(ctx context.Context, in *Reque
 	return out, nil
 }
 
-func (c *fetchPlatformDataClient) GetAllUserSubmissions(ctx context.Context, opts ...grpc.CallOption) (FetchPlatformData_GetAllUserSubmissionsClient, error) {
-	stream, err := c.cc.NewStream(ctx, &FetchPlatformData_ServiceDesc.Streams[0], "/proto.FetchPlatformData/getAllUserSubmissions", opts...)
+func (c *fetchPlatformDataClient) GetAllUserData(ctx context.Context, opts ...grpc.CallOption) (FetchPlatformData_GetAllUserDataClient, error) {
+	stream, err := c.cc.NewStream(ctx, &FetchPlatformData_ServiceDesc.Streams[0], "/proto.FetchPlatformData/getAllUserData", opts...)
 	if err != nil {
 		return nil, err
 	}
-	x := &fetchPlatformDataGetAllUserSubmissionsClient{stream}
+	x := &fetchPlatformDataGetAllUserDataClient{stream}
 	return x, nil
 }
 
-type FetchPlatformData_GetAllUserSubmissionsClient interface {
+type FetchPlatformData_GetAllUserDataClient interface {
 	Send(*Request) error
 	Recv() (*OperationStatus, error)
 	grpc.ClientStream
 }
 
-type fetchPlatformDataGetAllUserSubmissionsClient struct {
+type fetchPlatformDataGetAllUserDataClient struct {
 	grpc.ClientStream
 }
 
-func (x *fetchPlatformDataGetAllUserSubmissionsClient) Send(m *Request) error {
+func (x *fetchPlatformDataGetAllUserDataClient) Send(m *Request) error {
 	return x.ClientStream.SendMsg(m)
 }
 
-func (x *fetchPlatformDataGetAllUserSubmissionsClient) Recv() (*OperationStatus, error) {
+func (x *fetchPlatformDataGetAllUserDataClient) Recv() (*OperationStatus, error) {
 	m := new(OperationStatus)
 	if err := x.ClientStream.RecvMsg(m); err != nil {
 		return nil, err
@@ -90,7 +90,7 @@ func (x *fetchPlatformDataGetAllUserSubmissionsClient) Recv() (*OperationStatus,
 type FetchPlatformDataServer interface {
 	GetUserSubmissions(context.Context, *Request) (*SubmissionResponse, error)
 	GetUserContests(context.Context, *Request) (*ContestResponse, error)
-	GetAllUserSubmissions(FetchPlatformData_GetAllUserSubmissionsServer) error
+	GetAllUserData(FetchPlatformData_GetAllUserDataServer) error
 	mustEmbedUnimplementedFetchPlatformDataServer()
 }
 
@@ -104,8 +104,8 @@ func (UnimplementedFetchPlatformDataServer) GetUserSubmissions(context.Context, 
 func (UnimplementedFetchPlatformDataServer) GetUserContests(context.Context, *Request) (*ContestResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetUserContests not implemented")
 }
-func (UnimplementedFetchPlatformDataServer) GetAllUserSubmissions(FetchPlatformData_GetAllUserSubmissionsServer) error {
-	return status.Errorf(codes.Unimplemented, "method GetAllUserSubmissions not implemented")
+func (UnimplementedFetchPlatformDataServer) GetAllUserData(FetchPlatformData_GetAllUserDataServer) error {
+	return status.Errorf(codes.Unimplemented, "method GetAllUserData not implemented")
 }
 func (UnimplementedFetchPlatformDataServer) mustEmbedUnimplementedFetchPlatformDataServer() {}
 
@@ -156,25 +156,25 @@ func _FetchPlatformData_GetUserContests_Handler(srv interface{}, ctx context.Con
 	return interceptor(ctx, in, info, handler)
 }
 
-func _FetchPlatformData_GetAllUserSubmissions_Handler(srv interface{}, stream grpc.ServerStream) error {
-	return srv.(FetchPlatformDataServer).GetAllUserSubmissions(&fetchPlatformDataGetAllUserSubmissionsServer{stream})
+func _FetchPlatformData_GetAllUserData_Handler(srv interface{}, stream grpc.ServerStream) error {
+	return srv.(FetchPlatformDataServer).GetAllUserData(&fetchPlatformDataGetAllUserDataServer{stream})
 }
 
-type FetchPlatformData_GetAllUserSubmissionsServer interface {
+type FetchPlatformData_GetAllUserDataServer interface {
 	Send(*OperationStatus) error
 	Recv() (*Request, error)
 	grpc.ServerStream
 }
 
-type fetchPlatformDataGetAllUserSubmissionsServer struct {
+type fetchPlatformDataGetAllUserDataServer struct {
 	grpc.ServerStream
 }
 
-func (x *fetchPlatformDataGetAllUserSubmissionsServer) Send(m *OperationStatus) error {
+func (x *fetchPlatformDataGetAllUserDataServer) Send(m *OperationStatus) error {
 	return x.ServerStream.SendMsg(m)
 }
 
-func (x *fetchPlatformDataGetAllUserSubmissionsServer) Recv() (*Request, error) {
+func (x *fetchPlatformDataGetAllUserDataServer) Recv() (*Request, error) {
 	m := new(Request)
 	if err := x.ServerStream.RecvMsg(m); err != nil {
 		return nil, err
@@ -200,8 +200,8 @@ var FetchPlatformData_ServiceDesc = grpc.ServiceDesc{
 	},
 	Streams: []grpc.StreamDesc{
 		{
-			StreamName:    "getAllUserSubmissions",
-			Handler:       _FetchPlatformData_GetAllUserSubmissions_Handler,
+			StreamName:    "getAllUserData",
+			Handler:       _FetchPlatformData_GetAllUserData_Handler,
 			ServerStreams: true,
 			ClientStreams: true,
 		},
