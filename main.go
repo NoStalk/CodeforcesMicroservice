@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"io"
 	"io/ioutil"
 	"log"
@@ -172,12 +171,13 @@ type server struct{
 
 
 func (*server) GetUserSubmissions(ctx context.Context, req *platformDatapb.Request) (*platformDatapb.SubmissionResponse, error){
-	fmt.Println("GetUserSubmissions function invoked with user handle");
+	log.Println("GetUserSubmissions function invoked with user handle");
 	cfHandle := req.GetUserHandle();
 	userEmail := req.GetEmail();
 	rawSubmissionsArray := codeforcesSubmissionsRequestHandler(cfHandle);
 	
 	
+	submissionsArrayforDB := submissionDataConverterforDB(rawSubmissionsArray);
 	mongoURI := os.Getenv("DB_URI");
 	var dbResources utilities.DBResources;
 	var err error;
@@ -185,7 +185,6 @@ func (*server) GetUserSubmissions(ctx context.Context, req *platformDatapb.Reque
 	if err != nil {
 		log.Printf("Couldnt connect to Database: %v", err);
 	}
-	submissionsArrayforDB := submissionDataConverterforDB(rawSubmissionsArray);
 	utilities.AppendSubmissionData(dbResources,userEmail,"Codeforces",submissionsArrayforDB);
 	grpcSubmissionsResponseArray := utilities.FormatSubmissionDBToGRPC(submissionsArrayforDB);
 	utilities.CloseDatabaseConnection(dbResources);
@@ -210,19 +209,20 @@ func (*server) GetUserSubmissions(ctx context.Context, req *platformDatapb.Reque
 
 
 func (*server) GetUserContests(ctx context.Context, req *platformDatapb.Request) (*platformDatapb.ContestResponse, error){
-	fmt.Println("GetUserContests function invoked with user handle");
+	log.Println("GetUserContests function invoked with user handle");
 	cfHandle := req.GetUserHandle();
 	userEmail := req.GetEmail();
-	rawContestsArray := codeforcesContestRequestHandler(cfHandle);
 	
+	rawContestsArray := codeforcesContestRequestHandler(cfHandle);
+	contestArrayforDB := contestDataConverterforDB(rawContestsArray);
 	mongoURI := os.Getenv("DB_URI");
 	var dbResources utilities.DBResources;
 	var err error;
+
 	dbResources, err = utilities.OpenDatabaseConnection(mongoURI);
 	if err != nil {
 		log.Printf("Couldnt connect to Database: %v", err);
 	}
-	contestArrayforDB := contestDataConverterforDB(rawContestsArray);
 	utilities.AppendContestData(dbResources,userEmail,"Codeforces",contestArrayforDB);
 	grpcContestsResponseArray := utilities.FormatContestDBToGRPC(contestArrayforDB);
 	utilities.CloseDatabaseConnection(dbResources);
@@ -230,7 +230,6 @@ func (*server) GetUserContests(ctx context.Context, req *platformDatapb.Request)
 	response := &platformDatapb.ContestResponse{
 		Contests: grpcContestsResponseArray,
 	}
-
 	return response, nil;
 }
 
@@ -244,7 +243,7 @@ func (*server) GetUserContests(ctx context.Context, req *platformDatapb.Request)
 
 
 func(*server) GetAllUserData(stream platformDatapb.FetchPlatformData_GetAllUserDataServer) error{
-	fmt.Println("Bi-Directional Streamin function invoked");
+	log.Println("Bi-Directional Streamin function invoked");
 	mongoURI := os.Getenv("DB_URI");
 	start := time.Now();
 	var dbResources utilities.DBResources;
@@ -259,12 +258,12 @@ func(*server) GetAllUserData(stream platformDatapb.FetchPlatformData_GetAllUserD
 
 		if err == io.EOF {
 			utilities.CloseDatabaseConnection(dbResources);
-			fmt.Printf("Time taken to write all the data and send confirmation: %f\n", time.Since(start).Seconds());
+			log.Printf("Time taken to write all the data and send confirmation: %f\n", time.Since(start).Seconds());
 			return nil;
 		}
 
 		if err != nil {
-			fmt.Printf("Error while reading the stream: %v", err);
+			log.Printf("Error while reading the stream: %v", err);
 		}
 		cfHandle := req.GetUserHandle();
 		userEmail := req.GetEmail();
@@ -289,7 +288,7 @@ func(*server) GetAllUserData(stream platformDatapb.FetchPlatformData_GetAllUserD
 		})		
 		
 		if sendErr != nil {
-			fmt.Printf("Error while sending data to client: %v", sendErr);
+			log.Printf("Error while sending data to client: %v", sendErr);
 			utilities.CloseDatabaseConnection(dbResources);
 			return sendErr;
 		}
@@ -313,7 +312,7 @@ func codeforcesSubmissionsRequestHandler(cfHandle string) ([]Submissions) {
 		response, err := http.Get(queryString);
 		
 		if err != nil {
-			fmt.Print(err.Error())
+			log.Print(err.Error())
 			os.Exit(1)
 		}
 	
@@ -323,7 +322,7 @@ func codeforcesSubmissionsRequestHandler(cfHandle string) ([]Submissions) {
 		}
 		responseCFSubmissions, err := UnmarshalCFSubmissionResponse(responseData);
 		if err!=nil {
-			fmt.Printf("Couldnt unmarshal the byte slice: %v", err);
+			log.Printf("Couldnt unmarshal the byte slice: %v", err);
 		}
 	
 
@@ -343,7 +342,7 @@ func codeforcesContestRequestHandler(cfHandle string) ([]Contests){
 	response, err := http.Get(queryString);
 
 	if err != nil {
-		fmt.Print(err.Error())
+		log.Print(err.Error())
 		os.Exit(1)
 	}
 
@@ -353,7 +352,7 @@ func codeforcesContestRequestHandler(cfHandle string) ([]Contests){
 	}
 	responseCFContests, err := UnmarshalCFContestResponse(responseData);
 	if err!=nil {
-		fmt.Printf("Couldnt unmarshal the byte slice: %v", err);
+		log.Printf("Couldnt unmarshal the byte slice: %v", err);
 	}
 
 	return responseCFContests.Contests;
@@ -422,7 +421,7 @@ func fetchAllContests() []ContestResponse {
 	response, err := http.Get(queryString);
 
 	if err != nil {
-		fmt.Print(err.Error())
+		log.Print(err.Error())
 		os.Exit(1)
 	}
 
@@ -432,10 +431,15 @@ func fetchAllContests() []ContestResponse {
 	}
 	responseCFContestList, err := UnmarshalCFContestListResponse(responseData);
 	if err!=nil {
-		fmt.Printf("Couldnt unmarshal the byte slice: %v", err);
+		log.Printf("Couldnt unmarshal the byte slice: %v", err);
 	}
+	allContests := responseCFContestList.AllContests;
 
-	return responseCFContestList.AllContests;
+	sort.Slice(allContests,func(i,j int) bool{
+		return allContests[i].StartTimeSeconds < allContests[j].StartTimeSeconds;
+	})
+
+	return allContests;
 
 }
 
@@ -447,10 +451,24 @@ func fetchAllContests() []ContestResponse {
 **/
 
 func findContestAndReturnDate(AllContests []ContestResponse, contestID int64) string {
-	 indexOfContest := sort.Search(len(AllContests),func(index int) bool {return AllContests[index].ID==contestID});
-	return strconv.FormatInt(AllContests[indexOfContest].StartTimeSeconds, 10);
-}
+	//Binary Search, the function only returns lower bounds or upper bounds, to check for the existence of an element, use == separately.
+	indexOfContest := sort.Search(len(AllContests),func(index int) bool {return AllContests[index].ID>=contestID});
+	
+	//Linear Search incase the Binary Search doesnt work
+	// for i := 0; i<len(AllContests);i++{
+	// 	if(contestID==AllContests[i].ID){
+	// 		indexOfContest = i;
+	// 		break;
+	// 	}
+			
+	// }
 
+	if(indexOfContest==len(AllContests)){
+		log.Fatalln("Couldnt find the contest");
+	}
+	return strconv.FormatInt(AllContests[indexOfContest].StartTimeSeconds, 10);
+	
+}
 
 
 func main(){
@@ -464,13 +482,11 @@ func main(){
 		log.Fatalf("Failed to listen: %v", err);
 	}
 	s := grpc.NewServer();
+	fetchAllContests();
 	platformDatapb.RegisterFetchPlatformDataServer(s, &server{});
-	fmt.Println("Server started on port 5003");
+	log.Println("Server started on port 5003");
 	if err = s.Serve(lis); err != nil {
 		log.Fatalf("Failed to serve: %v", err);
 	} 
-	submissionsArray := codeforcesSubmissionsRequestHandler("zeus_codes");
-	contestsArray := codeforcesContestRequestHandler("zeus_codes");
-	fmt.Println(len(submissionsArray), len(contestsArray));
 
 }
