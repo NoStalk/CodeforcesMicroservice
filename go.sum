@@ -3,6 +3,8 @@ cloud.google.com/go v0.34.0/go.mod h1:aQUYkXzVsufM+DwF1aE+0xfcU+56JwCaLick0ClmMT
 github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=
 github.com/NoStalk/protoDefinitions v0.0.0-20220807184611-7b23db2a1467 h1:1eMoeeyw6KDhiYrQIJ7P7+QrrhBHwz6BI/zB5hL9Nis=
 github.com/NoStalk/protoDefinitions v0.0.0-20220807184611-7b23db2a1467/go.mod h1:Pk1/vcNdiRgYSvQthC1RNjHplRLlAppm/zv0PVYZSbg=
+github.com/NoStalk/serviceUtilities v0.0.0-20220806200201-d57930ad1d8a h1:vOJ4+1r2slX1uPmHmUowQ9bmNUB6afRCZuXYijBA67Q=
+github.com/NoStalk/serviceUtilities v0.0.0-20220806200201-d57930ad1d8a/go.mod h1:4V2xV6GoUk0b9mF4L/+UvC+f0Sd3SbN2YtwIvGkqH6Y=
 github.com/antihax/optional v1.0.0/go.mod h1:uupD/76wgC+ih3iEmQUL+0Ugr19nfwCT1kdvxnR2qWY=
 github.com/census-instrumentation/opencensus-proto v0.2.1/go.mod h1:f6KPmirojxKA12rnyqOA5BBL4O983OfeGPqjHWSTneU=
 github.com/cespare/xxhash/v2 v2.1.1/go.mod h1:VGX0DQ3Q6kWi7AoAeZDth3/j3BFtOZR5XLFGgcrjCOs=

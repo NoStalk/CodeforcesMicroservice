@@ -186,7 +186,7 @@ func (*server) GetUserSubmissions(ctx context.Context, req *platformDatapb.Reque
 		log.Printf("Couldnt connect to Database: %v", err);
 	}
 	utilities.AppendSubmissionData(dbResources,userEmail,"Codeforces",submissionsArrayforDB);
-	grpcSubmissionsResponseArray := utilities.FormatSubmissionDBToGRPC(submissionsArrayforDB);
+	grpcSubmissionsResponseArray := utilities.CreateGRPCSubmissionResponseFromSubmissionSchema(submissionsArrayforDB);
 	utilities.CloseDatabaseConnection(dbResources);
 
 	response := &platformDatapb.SubmissionResponse{
@@ -224,9 +224,8 @@ func (*server) GetUserContests(ctx context.Context, req *platformDatapb.Request)
 		log.Printf("Couldnt connect to Database: %v", err);
 	}
 	utilities.AppendContestData(dbResources,userEmail,"Codeforces",contestArrayforDB);
-	grpcContestsResponseArray := utilities.FormatContestDBToGRPC(contestArrayforDB);
+	grpcContestsResponseArray := utilities.CreateGRPCContestResponseFromContestSchema(contestArrayforDB);
 	utilities.CloseDatabaseConnection(dbResources);
-	
 	response := &platformDatapb.ContestResponse{
 		Contests: grpcContestsResponseArray,
 	}
